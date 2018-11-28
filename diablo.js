@@ -1,6 +1,11 @@
+//Contador de imagens
 let imageCount = 0;
+
+//Objeto com as informações necessárias para carregar a fase do jogo
+//Atualmente é uma única fase estatica
 let level = {
     floor: {
+        // Caminho para a pasta com imagens do piso
         prefix: "dttool/output/1/",
         map: [
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -28,6 +33,7 @@ let level = {
         }
     },
     wall: {
+        // Caminho para as imagens das paredes
         prefix: "dttool/output/0/",
         map: [
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -77,6 +83,7 @@ let level = {
         }
     },
     object: {
+        //caminho dos objetos (mesa, cadeiras, etc..)
         prefix: "dttool/output/2/",
         map: [
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -158,11 +165,17 @@ let level = {
         }
     }
 };
+
+//captura o canvas para criar a area do jogo
 let floor = document.getElementById("floor").getContext("2d");
 floor.w = floor.canvas.width;
 floor.h = floor.canvas.height;
+
+//variaveis de ambiente
 let tw = 160, th = tw / 2, s = tw * 0.705, a = Math.PI / 4, visible = 7, asin = acos = Math.sin(a);
 
+// Informações dos monstros
+// Importante: BA é o barbaro, que deve ter sido adicionado por ter o mesmo comportamento
 let monsterMap = {
     SK: {
         A1: loadImage("monsters/SK/A1/map.png", 8, 16, true),
@@ -190,17 +203,20 @@ let monsterMap = {
     }
 };
 
-// aggresive mobs
+// Variaveis que controlam os objetos da tela
 let monsters = [], deathmobs = [], barrels = [], coins = [], potions = [], walls = [];
-
+// Não testei ainda
 let showMap = false;
-
+// Carrega as imagens para o barril, moeda e poção
 let barrelSprite = loadImage("sprite/barrel64.png");
 let coinSprite = loadImage("sprite/coins10.png");
 let potionSprite = loadImage("sprite/potions.png");
+// nosso char
 let hero;
 
-
+// Classe mãe de diversas outras classes
+// TODO:
+// Criar nomes pertinentes as variaveis
 class Shape {
     constructor(sprite, x, y) {
         this.x = x;
@@ -208,13 +224,17 @@ class Shape {
         this.offset_x = 0;
         this.offset_y = 0;
         this.sprite = sprite;
-        this.isAboveHero = function () {
-            let maxlen = tw * visible / 2;
-            return (Math.abs(this.x - hero.x) <= maxlen) && (Math.abs(this.y - hero.y) <= maxlen);
-        };
     }
+
+    isAboveHero() {
+        let maxlen = tw * visible / 2;
+        return (Math.abs(this.x - hero.x) <= maxlen) && (Math.abs(this.y - hero.y) <= maxlen);
+    };
 }
 
+// TODO:
+// Criar comentário de explicação da classe
+// Criar nomes pertinentes as variaveis
 class Mob extends Shape {
     constructor(x, y, name) {
         super(monsterMap[name].NU, x, y);
@@ -228,77 +248,89 @@ class Mob extends Shape {
         this.step = 0;
         this.angle = 0;
         this.st = 8;
-        this.rotate = function (sx, sy) {
-            let l = this.currentState.angles;
-            this.angle = Math.round((Math.atan2(sy, sx) / Math.PI + 2.75) * l / 2 + l / 2) % l;
-        };
-        this.rotateTo = function (point) {
-            this.rotate(point.x - this.x, point.y - this.y);
-        };
-        this.setState = function (state) {
-            if (this.currentState != state) {
-                this.currentState = state;
-                this.step = -1;
+
+        this.origin_health = this.health = 1000;
+        this.resistance = 10; // damage resistance, less than 1000
+
+    }
+
+    rotate(sx, sy) {
+        let l = this.currentState.angles;
+        this.angle = Math.round((Math.atan2(sy, sx) / Math.PI + 2.75) * l / 2 + l / 2) % l;
+    };
+
+    rotateTo(point) {
+        this.rotate(point.x - this.x, point.y - this.y);
+    };
+
+    setState(state) {
+        if (this.currentState != state) {
+            this.currentState = state;
+            this.step = -1;
+        }
+    };
+
+    nextStep() {
+        let dx = (this.to_x - this.x), dy = (this.to_y - this.y);
+        if ((Math.sqrt((dx * dx) + (dy * dy))) > this.st) { // run
+            let tx = 0;
+            let ty = 0;
+            for (let st = 0; st < this.st; st += 0.01) {
+                let sx = st * dx / Math.sqrt((dx * dx) + (dy * dy));
+                let sy = sx * dy / dx;
+                if (isWayWall(this.x + sx, this.y + sy)) {
+                    tx = sx;
+                    ty = sy;
+                }
+                else
+                    break;
             }
-        };
-        this.nextStep = function () {
-            let dx = (this.to_x - this.x), dy = (this.to_y - this.y);
-            if ((Math.sqrt((dx * dx) + (dy * dy))) > this.st) { // run
-                let tx = 0;
-                let ty = 0;
-                for (let st = 0; st < this.st; st += 0.01) {
-                    let sx = st * dx / Math.sqrt((dx * dx) + (dy * dy));
-                    let sy = sx * dy / dx;
-                    if (isWayWall(this.x + sx, this.y + sy)) {
-                        tx = sx;
-                        ty = sy;
-                    }
-                    else
-                        break;
-                }
-                this.rotate(tx, ty);
-                if (Math.sqrt((tx * tx) + (ty * ty)) >= this.st / 2) {
-                    this.x += tx;
-                    this.y += ty;
-                    this.setState(this.run);
-                }
-                else {
-                    this.setState(this.stay);
-                    this.x += tx;
-                    this.y += ty;
-                    this.to_x = this.x;
-                    this.to_y = this.y;
-                }
+            this.rotate(tx, ty);
+            if (Math.sqrt((tx * tx) + (ty * ty)) >= this.st / 2) {
+                this.x += tx;
+                this.y += ty;
+                this.setState(this.run);
             }
             else {
                 this.setState(this.stay);
+                this.x += tx;
+                this.y += ty;
                 this.to_x = this.x;
                 this.to_y = this.y;
             }
-            this.step = (this.step + 1) % (this.currentState.steps);
-            this.sprite = this.currentState;
-        };
-        this.origin_health = this.health = 1000;
-        this.resistance = 10; // damage resistance, less than 1000
-        this.use = function (mob) {
-            if (mob.doAttack)
-                mob.doAttack(this);
-        };
-        this.damage = function (damage) {
-            let health = this.health - damage * 1000 / (1000 - this.resistance);
-            if (health <= 0) {
-                this.health = 0;
-                remove(monsters, this);
-                if (this.death)
-                    deathmobs.push(new DeathMob(this));
-            }
-            else {
-                this.health = health;
-            }
-        };
-    }
+        }
+        else {
+            this.setState(this.stay);
+            this.to_x = this.x;
+            this.to_y = this.y;
+        }
+        this.step = (this.step + 1) % (this.currentState.steps);
+        this.sprite = this.currentState;
+    };
+
+    use(mob) {
+        if (mob.doAttack)
+            mob.doAttack(this);
+    };
+
+    damage(damage) {
+        let health = this.health - damage * 1000 / (1000 - this.resistance);
+        if (health <= 0) {
+            this.health = 0;
+            remove(monsters, this);
+            if (this.death)
+                deathmobs.push(new DeathMob(this));
+        }
+        else {
+            this.health = health;
+        }
+    };
 }
 
+// Criatura que atacam
+// TODO:
+// Descobrir pq o nextStep da stackoverflow se tirar do construtor
+// Como sempre, melhorar o nome das varaiveis
 class AgressiveMob extends Mob {
     constructor(x, y, name) {
         super(x, y, name);
@@ -327,20 +359,25 @@ class AgressiveMob extends Mob {
             this.offset_y = this.currentState == this.attack ? this.attackOffset : this.normalOffset;
         };
         this.currentDamage = 30;
-        this.getDamage = function () {
-            return this.currentDamage;
-        };
+
         this.attacked = null;
-        this.doAttack = function (mob) {
-            if (this.attacked != mob) {
-                this.rotateTo(mob);
-                this.setState(this.attack);
-                this.attacked = mob;
-            }
-        };
-    }
+    };
+
+    getDamage() {
+        return this.currentDamage;
+    };
+
+    doAttack(mob) {
+        if (this.attacked != mob) {
+            this.rotateTo(mob);
+            this.setState(this.attack);
+            this.attacked = mob;
+        }
+    };
 }
 
+
+// Classe do nosso char
 class HeroBarbarian extends AgressiveMob {
     constructor(x, y) {
         super(x, y, "BA");
@@ -349,23 +386,26 @@ class HeroBarbarian extends AgressiveMob {
         this.health = this.origin_health = 1000;
         this.belt = { items: [], size: 10 };
         this.st = 16;
-        this.addToBelt = function (potion) {
-            for (let i = 0; i < this.belt.size; i++) {
-                if (typeof this.belt.items[i] == "undefined") {
-                    this.belt.items[i] = potion;
-                    return true;
-                }
-            }
-            return false;
-        };
         this.criticalDamage = 0.4;
         this.currentDamage = 320;
-        this.getDamage = function () {
-            return this.currentDamage * (Math.random() <= this.criticalDamage ? 4 : 1);
-        };
     }
+
+    addToBelt(potion) {
+        for (let i = 0; i < this.belt.size; i++) {
+            if (typeof this.belt.items[i] == "undefined") {
+                this.belt.items[i] = potion;
+                return true;
+            }
+        }
+        return false;
+    };
+
+    getDamage() {
+        return this.currentDamage * (Math.random() <= this.criticalDamage ? 4 : 1);
+    };
 }
 
+// TODO
 class BaseWall extends Shape {
     constructor(sprite, header, x, y) {
         super(sprite, x, y);
@@ -376,6 +416,7 @@ class BaseWall extends Shape {
     }
 }
 
+// TODO
 class Wall extends BaseWall {
     constructor(index, x, y) {
         super(level.wall.tiles[index], level.wall.header[index], x, y);
@@ -407,6 +448,7 @@ class Wall extends BaseWall {
     }
 }
 
+// TODO
 class WallObject extends BaseWall {
     constructor(index, x, y) {
         super(level.object.tiles[index], level.object.header[index], x, y);
@@ -421,6 +463,7 @@ class WallObject extends BaseWall {
     }
 }
 
+// TODO
 class DeathMob extends Shape {
     constructor(mob) {
         super(mob.death, mob.x, mob.y);
@@ -438,6 +481,7 @@ class DeathMob extends Shape {
     }
 }
 
+// TODO
 class Barrel extends Shape {
     constructor(x, y) {
         super(barrelSprite, x, y);
@@ -453,6 +497,7 @@ class Barrel extends Shape {
     }
 }
 
+// TODO
 class Coin extends Shape {
     constructor(x, y) {
         super(coinSprite, x, y);
@@ -464,6 +509,7 @@ class Coin extends Shape {
     }
 }
 
+// TODO
 class Potion extends Shape {
     constructor(x, y) {
         super(potionSprite, x, y);
@@ -476,6 +522,7 @@ class Potion extends Shape {
     }
 }
 
+// TODO
 class PotionHealth extends Potion {
     constructor(x, y) {
         super(x, y);
@@ -488,6 +535,7 @@ class PotionHealth extends Potion {
     }
 }
 
+// TODO
 function loadImage(url, angles, steps, offsetX) {
     imageCount++;
     let i = new Image();
@@ -503,16 +551,19 @@ function loadImage(url, angles, steps, offsetX) {
     return i;
 }
 
+// TODO
 function load(img, callback) {
     if (img.complete) callback();
     else img.addEventListener('load', callback, false);
 }
 
+// TODO
 for (let l in level) {
     level[l].tiles = {};
     for (i in level[l].header) if (!level[l].tiles[i]) level[l].tiles[i] = loadImage(level[l].prefix + i + ".png");
 }
 
+// TODO
 function isWayWall(x, y) {
     let block_x = Math.floor(x / s),
         block_y = Math.floor(y / s),
@@ -535,6 +586,7 @@ function isWayWall(x, y) {
     return true;
 }
 
+// TODO
 function getFloorTile(x, y) {
     if (!level.floor.map[y]) return null;
     if (!level.floor.map[y][x]) return null;
@@ -542,6 +594,7 @@ function getFloorTile(x, y) {
     return level.floor.tiles[f];
 }
 
+// TODO
 function renderHeroHealth() {
     let radius = 80, padding = 20;
     floor.save();
@@ -564,6 +617,7 @@ function renderHeroHealth() {
     floor.restore();
 }
 
+// TODO
 function renderHeroBelt() {
     floor.save();
     let tile = potionSprite;
@@ -583,6 +637,7 @@ function renderHeroBelt() {
     floor.restore();
 }
 
+// TODO
 function loadZb(order, click) {
     let tmp_zb = [], zb = [];
     let all = [monsters, potions, barrels, click ? [] : [hero], click ? [] : walls];
@@ -597,6 +652,7 @@ function loadZb(order, click) {
     return zb;
 }
 
+// TODO
 function processClick() {
     let zb = loadZb(true, true);
     let cx = (floor.click_x - floor.click_y) * acos,
@@ -617,6 +673,7 @@ function processClick() {
     return false;
 }
 
+// TODO
 function renderObjects() {
     let zb = loadZb(false);
     for (z in zb) {
@@ -654,6 +711,7 @@ function renderObjects() {
     }
 }
 
+// TODO
 function renderFloor() {
     floor.save();
     floor.translate(floor.w / 2 - th, floor.h / 2);// translate to center
@@ -684,6 +742,7 @@ function renderFloor() {
     floor.restore();
 }
 
+// TODO
 function renderMap() {
     floor.save();
     floor.translate(floor.w / 2, floor.h / 2);
@@ -703,6 +762,7 @@ function renderMap() {
     floor.restore();
 }
 
+// TODO
 function remove(ar, v) { let i = ar.indexOf(v); if (i >= 0) ar.splice(i, 1); }
 function randomx() { return Math.floor(Math.random() * (level.floor.map[0].length) * s); }
 function randomy() { return Math.floor(Math.random() * (level.floor.map.length) * s); }
