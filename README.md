@@ -1,23 +1,19 @@
 diablo-js
 =========
 
-Isometric minimal-code style game at html5 canvas and javascript
+Versão JavaScript (e bem simplificada) do jogo Diablo 2.
 
-Demo
-----
 
-http://mitallast.github.com/diablo-js/
-
-CHANGELOG
+Updates
 ---------
 
-- Big update! Extracted one original level from Diablo 2
-- Use [tab] to show map
-- New map layers - walls, floors, objects
-- Tools for extract levels, pictures and another resources from origin Diablo 2 files
+- Criado e traduzidos comentários para o Português
+- Iniciado testes de renderização para aumentar o Mapa
+- Iniciado a conversão de funções em classes
+- Feito o Fork do Mitllast
 
 
-Useful tools
+Ferramentas para extração de imagens fornecidas pelo Mitallast
 ------------
 
 Tool for extract original diablo resources:
