@@ -233,7 +233,6 @@ let potionSprite = loadImage("sprite/potions.png");
 let hero;
 
 
-
 // TODO
 function loadImage(url, angles, steps, offsetX) {
     imageCount++;
