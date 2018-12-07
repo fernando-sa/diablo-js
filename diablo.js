@@ -1,3 +1,5 @@
+// Ainda tem bastante para "arrumar" neste arquivo
+
 //Contador de imagens
 let imageCount = 0;
 
@@ -10,19 +12,19 @@ let level = {
         map: [
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 756, 756, 756, 756, 756, 756, 0, 0, 0],
-            [0, 756, 756, 756, 756, 756, 756,756, 756, 756,756, 756, 756,756],
-            [0, 756, 756, 756, 756, 756, 756,756, 756, 756,756, 756, 756,756],
-            [0, 756, 756, 756, 756, 756, 756,756, 756, 756,756, 756, 756,756],
-            [0, 756, 756, 756, 756, 756, 756,756, 756, 756,756, 756, 756,756],
-            [0, 756, 756, 756, 756, 756, 756,756, 756, 756,756, 756, 756,756],
-            [0, 756, 756, 756, 756, 756, 756,756, 756, 756,756, 756, 756,756],
-            [0, 756, 756, 756, 756, 756, 756,756, 756, 756,756, 756, 756,756],
-            [0, 756, 756, 756, 756, 756, 756,756, 756, 756,756, 756, 756,756],
-            [0, 756, 756, 756, 756, 756, 756,756, 756, 756,756, 756, 756,756],
-            [0, 756, 756, 756, 756, 756, 756,756, 756, 756,756, 756, 756,756],
-            [0, 756, 756, 756, 756, 756, 756,756, 756, 756,756, 756, 756,756],
-            [0, 756, 756, 756, 756, 756, 756,756, 756, 756,756, 756, 756,756],
-            [0, 756, 756, 756, 756, 756, 756,756, 756, 756,756, 756, 756,756],
+            [0, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756],
+            [0, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756],
+            [0, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756],
+            [0, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756],
+            [0, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756],
+            [0, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756],
+            [0, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756],
+            [0, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756],
+            [0, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756],
+            [0, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756],
+            [0, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756],
+            [0, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756],
+            [0, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756],
             [0, 756, 756, 1140, 756, 756, 756, 756, 756, 756, 756],
             [0, 756, 756, 660, 660, 372, 756, 756, 756, 756, 756],
             [0, 756, 756, 756, 756, 756, 756, 756, 756, 756, 756],
@@ -63,7 +65,7 @@ let level = {
             [0, 468, 0, 0, 0, 0, 0, 0, 0, 0, 0, 468],
             [0, 468, 0, 0, 0, 0, 0, 0, 0, 0, 0, 468],
             [0, 468, 0, 0, 0, 0, 0, 0, 0, 0, 0, 468],
-            [0, 2004, 372,372,372,372,372,372,372,372,372,1140],
+            [0, 2004, 372, 372, 372, 372, 372, 372, 372, 372, 372, 1140],
         ],
         header: {
             276: { orientation: 8, main_index: 5, sub_index: 2, direction: 1, walk: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,] },
@@ -234,236 +236,15 @@ let hero;
 
 
 // TODO
-function loadImage(url, angles, steps, offsetX) {
-    imageCount++;
-    let i = new Image();
-    i.onload = function () {
-        imageCount--;
-        i.offsetX = offsetX ? ((i.height / angles) >> 2) : 0;
-    }
-    i.src = url;
-    if (typeof angles != "undefined" && typeof steps != "undefined") {
-        i.angles = angles;
-        i.steps = steps;
-    }
-    return i;
-}
-
-// TODO
-function load(img, callback) {
-    if (img.complete) callback();
-    else img.addEventListener('load', callback, false);
-}
-
-// TODO
 for (let l in level) {
     level[l].tiles = {};
     for (i in level[l].header) if (!level[l].tiles[i]) level[l].tiles[i] = loadImage(level[l].prefix + i + ".png");
 }
 
-// TODO
-function isWayWall(x, y) {
-    let block_x = Math.floor(x / s),
-        block_y = Math.floor(y / s),
-        ix = Math.floor((x % s) / (s / 5)),
-        iy = 4 - Math.floor((y % s) / (s / 5)),
-        w_inx = iy * 5 + ix, h, idx;
-    for (let l in level) {
-        if (level[l].map[block_y] && (idx = level[l].map[block_y][block_x]) && (h = level[l].header[idx])) {
-            if (h.walk[w_inx] == 1) return false;
-            else if (h.orientation == 3) {
-                for (let idx in level.wall.header) {
-                    let tb = level.wall.header[idx];
-                    if (tb.main_index == h.main_index && tb.sub_index == h.sub_index && tb.orientation == 4 && h.walk[w_inx] == 1) {
-                        return false;
-                    }
-                }
-            }
-        }
-    }
-    return true;
-}
 
-// TODO
-function getFloorTile(x, y) {
-    if (!level.floor.map[y]) return null;
-    if (!level.floor.map[y][x]) return null;
-    let f = level.floor.map[y][x];
-    return level.floor.tiles[f];
-}
 
-// TODO
-function renderHeroHealth() {
-    let radius = 80, padding = 20;
-    floor.save();
-    floor.globalAlpha = 0.4;
-    // draw health colb
-    floor.fillStyle = "black";
-    floor.beginPath();
-    floor.arc(radius + padding, floor.h - radius - padding, radius + 4, 0, Math.PI * 2);
-    floor.closePath();
-    floor.fill();
-    // draw health
-    floor.fillStyle = "red";
-    let percent = hero.health / hero.origin_health;
-    let angleFrom = Math.PI * (0.5 - percent);
-    let angleTo = Math.PI * (0.5 + percent);
-    floor.beginPath();
-    floor.arc(radius + padding, floor.h - radius - padding, radius, angleFrom, angleTo);
-    floor.closePath();
-    floor.fill();
-    floor.restore();
-}
 
-// TODO
-function renderHeroBelt() {
-    floor.save();
-    let tile = potionSprite;
-    let tw = tile.width / tile.steps;
-    let th = tile.height / tile.angles;
-    for (let i = 0; i < hero.belt.size; i++) {
-        floor.drawImage(tile,
-            tw * 2, th * 3, tw, th,
-            200 + tw * i, 600, tw, th);
-        let p = hero.belt.items[i];
-        if (p) {
-            floor.drawImage(tile,
-                tw * p.step, th * p.angle, tw, th,
-                200 + tw * i, 600, tw, th);
-        }
-    }
-    floor.restore();
-}
 
-// TODO
-function loadZb(order, click) {
-    let tmp_zb = [], zb = [];
-    let all = [monsters, potions, barrels, click ? [] : [hero], click ? [] : walls];
-    for (let t in all)
-        for (let m in all[t])
-            if (all[t][m].isAboveHero())
-                tmp_zb.push(all[t][m]);
-    // asc sort
-    tmp_zb.sort(function (a, b) { let c = (b.x + b.offset_x) + (b.y + b.offset_y) - (a.x + a.offset_x) - (a.y + a.offset_y); return order ? c : 0 - c });
-    all = [coins, deathmobs, tmp_zb];
-    for (let i in all) for (let j in all[i]) zb.push(all[i][j]);
-    return zb;
-}
-
-// TODO
-function processClick() {
-    let zb = loadZb(true, true);
-    let cx = (floor.click_x - floor.click_y) * acos,
-        cy = (floor.click_x + floor.click_y) / 2 * asin;
-    for (let i in zb) {
-        let m = zb[i];
-        let spr = m.sprite;
-        let sx = (m.x - m.y) * acos + m.offset_x,
-            sy = (m.x + m.y) / 2 * asin + m.offset_y;
-
-        let spr_w = spr.angles ? spr.width / spr.angles : spr.width;
-        let spr_h = spr.steps ? spr.height / spr.steps : spr.height;
-        if (cx >= sx - spr_w / 2 && cx <= sx + spr_w / 2 && cy >= sy - spr_h && cy <= sy) {
-            m.use(hero)
-            return true;
-        }
-    }
-    return false;
-}
-
-// TODO
-function renderObjects() {
-    let zb = loadZb(false);
-    for (z in zb) {
-        let m = zb[z];
-        floor.save()
-        let sx = (m.x - m.y) * acos + m.offset_x,
-            sy = (m.x + m.y) / 2 * asin + m.offset_y;
-        let tile = m.sprite;
-        // render sprite
-        let tw = tile.width;
-        let th = tile.height
-        if (tile.steps && tile.angles) {
-            tw /= tile.steps;
-            th /= tile.angles;
-            floor.drawImage(tile,
-                tw * m.step, th * m.angle, tw, th,
-                Math.round(sx - tw / 2 - tile.offsetX), Math.round(sy - th), tw, th);
-        } else {
-            floor.drawImage(tile, Math.round(sx - tile.width / 2) + 1, Math.round(sy - tile.height) + 1);
-        }
-        floor.restore()
-        // health line
-        if (m.health && m.origin_health && m != hero) {
-            floor.save()
-            floor.globalAlpha = 0.7
-            sy -= 90;
-            let lm = Math.floor(m.origin_health / 20),
-                lr = Math.floor(m.health / 20)
-            floor.fillStyle = "black"
-            floor.fillRect(sx - lm / 2 - 1, sy, lm + 2, 6);
-            floor.fillStyle = "red"
-            floor.fillRect(sx - lm / 2, sy + 1, lr, 4);
-            floor.restore()
-        }
-    }
-}
-
-// TODO
-function renderFloor() {
-    floor.save();
-    floor.translate(floor.w / 2 - th, floor.h / 2);// translate to center
-    let fdx = Math.floor(hero.x / s), // hero tile
-        fdy = Math.floor(hero.y / s),
-        miny = Math.max(0, fdy - visible), // calculate camera visible tiles
-        maxy = Math.min(level.floor.map.length - 1, fdy + visible),
-        minx = Math.max(0, fdx - visible),
-        maxx = Math.min(level.floor.map[0].length - 1, fdx + visible);
-    // translate to hero
-    let mrx = hero.x * acos - hero.y * asin,
-        mry = hero.x * asin + hero.y * acos;
-    mry = mry / 2;
-    floor.translate(-mrx, -mry);
-    // render
-    for (let y = miny; y <= maxy; y++) {
-        for (let x = minx; x <= maxx; x++) {
-            let tile = getFloorTile(x, y);
-            if (tile) {
-                let tx = (x - y) * th;
-                let ty = (x + y) * th / 2;
-                floor.drawImage(tile, tx, ty, tile.width + 0.707, tile.height + 0.707);
-            }
-        }
-    }
-    floor.translate(th, 0); // retranslate for diamond textures
-    renderObjects();
-    floor.restore();
-}
-
-// TODO
-function renderMap() {
-    floor.save();
-    floor.translate(floor.w / 2, floor.h / 2);
-    let sc = 0.5;
-    floor.scale(1 * sc, 0.5 * sc);
-    floor.rotate(Math.PI * 0.25);
-    floor.translate(-hero.x, -hero.y);
-    floor.fillStyle = "rgba(0,0,0,0.5)";
-    let wallOffset = [];
-    for (let y = 4; y >= 0; y--) for (let x = 0; x <= 4; x++) wallOffset.push({ x: x * s / 5, y: y * s / 5 });
-    for (let i in walls) {
-        let v = walls[i], walk = v.header.walk;
-        if (v.header.orientation == 4) continue;
-        for (let j = 0; j < 25; j++) if (walk[j] == 1) floor.fillRect(v.x + wallOffset[j].x, v.y + wallOffset[j].y, s / 5, s / 5);
-    }
-    floor.fillRect(hero.x, hero.y, s / 5, s / 5);
-    floor.restore();
-}
-
-// TODO
-function remove(ar, v) { let i = ar.indexOf(v); if (i >= 0) ar.splice(i, 1); }
-function randomx() { return Math.floor(Math.random() * (level.floor.map[0].length) * s); }
-function randomy() { return Math.floor(Math.random() * (level.floor.map.length) * s); }
 
 //"Engine"
 (function (undefined) {
@@ -499,7 +280,7 @@ function randomy() { return Math.floor(Math.random() * (level.floor.map.length) 
     }
 
     // passos para inimigos, ataque ao heroi
-    setInterval(function () { 
+    setInterval(function () {
         if (monsters.length == 0) return;
         let m = monsters[Math.ceil(Math.random() * (monsters.length - 1))];
         if (typeof m.attacked != "object") {
