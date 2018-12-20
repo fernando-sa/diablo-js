@@ -10,13 +10,13 @@ class Mob extends Shape {
         this.name = name;
         //// Setting some animations
         // Idle
-        this.stay = monsterMap[name].NU;
+        this.idle = monsterMap[name].NU;
         // Running
         this.run = monsterMap[name].WL;
         // Dead
         this.death = monsterMap[name].DD;
         //Setting start animation as idle
-        this.currentState = this.stay;
+        this.currentState = this.idle;
         this.step = 0;
         this.angle = 0;
         //Something to do with the speed of the mobs
@@ -50,13 +50,16 @@ class Mob extends Shape {
     // Function that decide what are the next animations
     // TODO: Abstract this to a proprer animation engine
     nextStep() {
-        let dx = (this.to_x - this.x), dy = (this.to_y - this.y);
-        if ((Math.sqrt((dx * dx) + (dy * dy))) > this.st) { // run
+        let distanceX = (this.to_x - this.x), distanceY = (this.to_y - this.y);
+
+        // If the instructions are to run
+        if ((Math.sqrt((distanceX * distanceX) + (distanceY * distanceY))) > this.st) {
             let tx = 0;
             let ty = 0;
             for (let st = 0; st < this.st; st += 0.01) {
-                let sx = st * dx / Math.sqrt((dx * dx) + (dy * dy));
-                let sy = sx * dy / dx;
+                let sx = st * distanceX / Math.sqrt((distanceX * distanceX) + (distanceY * distanceY));
+                let sy = sx * distanceY / distanceX;
+                // Wall colision check
                 if (isWayWall(this.x + sx, this.y + sy)) {
                     tx = sx;
                     ty = sy;
@@ -71,15 +74,16 @@ class Mob extends Shape {
                 this.setState(this.run);
             }
             else {
-                this.setState(this.stay);
+                this.setState(this.idle);
                 this.x += tx;
                 this.y += ty;
                 this.to_x = this.x;
                 this.to_y = this.y;
             }
         }
+        // If the mob need's to stay idle
         else {
-            this.setState(this.stay);
+            this.setState(this.idle);
             this.to_x = this.x;
             this.to_y = this.y;
         }
