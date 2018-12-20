@@ -3,16 +3,23 @@
 // Criar nomes pertinentes as variaveis
 class Mob extends Shape {
     constructor(x, y, name) {
+        // Passing location and idle animation to shape.js
         super(monsterMap[name].NU, x, y);
         this.to_x = x;
         this.to_y = y;
         this.name = name;
+        //// Setting some animations
+        // Idle
         this.stay = monsterMap[name].NU;
+        // Running
         this.run = monsterMap[name].WL;
+        // Dead
         this.death = monsterMap[name].DD;
+        //Setting start animation as idle
         this.currentState = this.stay;
         this.step = 0;
         this.angle = 0;
+        //Something to do with the speed of the mobs
         this.st = 8;
 
         this.origin_health = this.health = 1000;
@@ -20,11 +27,15 @@ class Mob extends Shape {
 
     }
 
+    // responsible for walking rotation
     rotate(sx, sy) {
         let l = this.currentState.angles;
         this.angle = Math.round((Math.atan2(sy, sx) / Math.PI + 2.75) * l / 2 + l / 2) % l;
     };
 
+
+    // responsible for the action rotation
+    // as attacking something behind the mob
     rotateTo(point) {
         this.rotate(point.x - this.x, point.y - this.y);
     };
@@ -36,6 +47,8 @@ class Mob extends Shape {
         }
     };
 
+    // Function that decide what are the next animations
+    // TODO: Abstract this to a proprer animation engine
     nextStep() {
         let dx = (this.to_x - this.x), dy = (this.to_y - this.y);
         if ((Math.sqrt((dx * dx) + (dy * dy))) > this.st) { // run

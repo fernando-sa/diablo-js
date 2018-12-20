@@ -3,11 +3,11 @@
 //Contador de imagens
 let imageCount = 0;
 
-//Objeto com as informações necessárias para carregar a fase do jogo
-//Atualmente é uma única fase estatica
+// level object responsible for loading the map
+// TODO: Refactor this engine to be possible and easy to create/load maps
 let level = {
     floor: {
-        // Caminho para a pasta com imagens do piso
+        // Mapping the floor
         prefix: "dttool/output/1/",
         map: [
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -42,7 +42,7 @@ let level = {
         }
     },
     wall: {
-        // Caminho para as imagens das paredes
+        // Mapping walls
         prefix: "dttool/output/0/",
         map: [
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -98,13 +98,13 @@ let level = {
         }
     },
     object: {
-        //caminho dos objetos (mesa, cadeiras, etc..)
+        //object's mapping (table, chairs, etc..)
         prefix: "dttool/output/2/",
         map: [
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 5844, 0, 0, 3828, 0, 0, 0],
-            [0, 0, 4212, 4116, 0, 0, 0, 3732, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 3732, 0, 0, 0],
             [0, 0, 0, 4404, 1524, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 4308, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -186,16 +186,16 @@ let level = {
     }
 };
 
-//captura o canvas para criar a area do jogo
+//link with index canvas
 let floor = document.getElementById("floor").getContext("2d");
 floor.w = floor.canvas.width;
 floor.h = floor.canvas.height;
 
-//variaveis de ambiente
-let tw = 160, th = tw / 2, s = tw * 0.705, a = Math.PI / 4, visible = 7, asin = acos = Math.sin(a);
+//isometric view variables
+let tw = 160, th = tw / 2, s = 160 * 0.705, a = Math.PI / 4, visible = 7, asin = acos = Math.sin(a);
 
-// Informações dos monstros
-// Importante: BA é o barbaro, que deve ter sido adicionado por ter o mesmo comportamento
+// monsters informations
+// BA being the hero, this 'monsterMap' deals with importing the animation frames
 let monsterMap = {
     SK: {
         A1: loadImage("monsters/SK/A1/map.png", 8, 16, true),

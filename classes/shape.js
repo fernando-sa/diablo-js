@@ -11,6 +11,7 @@ class Shape {
     }
 
     isAboveHero() {
+        
         let maxlen = tw * visible / 2;
         return (Math.abs(this.x - hero.x) <= maxlen) && (Math.abs(this.y - hero.y) <= maxlen);
     };
