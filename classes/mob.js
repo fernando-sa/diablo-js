@@ -4,6 +4,7 @@
 class Mob extends Shape {
     constructor(x, y, name) {
         super(monsterMap[name].NU, x, y);
+        // Where the mob needs to go in next step
         this.to_x = x;
         this.to_y = y;
         this.name = name;

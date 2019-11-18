@@ -1,7 +1,6 @@
-// Criatura que atacam
-// TODO:
-// Descobrir pq o nextStep da stackoverflow se tirar do construtor
-// Como sempre, melhorar o nome das varaiveis
+// TODO:Descobrir pq o nextStep da stackoverflow se tirar do construtor
+
+// This class handles everything for the agressiveMob, as knowing if it did damage
 class AgressiveMob extends Mob {
     constructor(x, y, name) {
         super(x, y, name);
@@ -12,11 +11,13 @@ class AgressiveMob extends Mob {
         this._nextStep = this.nextStep;
         this.nextStep = function () {
             if (!this.isAboveHero())
-                return;
+            // If it isn't in range, don't do anything ???
+            return;
             if (this.currentState == this.attack) {
                 if (this.step == (this.attack.steps - 1)) {
                     this.currentState = this.stay;
                     this.step = -1;
+                    // Check if it did damage
                     if (this.attacked) {
                         this.attacked.damage(this.getDamage());
                         this.attacked = null;

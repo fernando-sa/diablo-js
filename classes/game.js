@@ -77,7 +77,8 @@ function renderHeroBelt() {
     floor.restore();
 }
 
-// TODO
+// Zb = ?? 
+
 function loadZb(order, click) {
     let tmp_zb = [], zb = [];
     let all = [monsters, potions, barrels, click ? [] : [hero], click ? [] : walls];
@@ -182,7 +183,6 @@ function renderFloor() {
     floor.restore();
 }
 
-// TODO
 function renderMap() {
     floor.save();
     floor.translate(floor.w / 2, floor.h / 2);

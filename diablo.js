@@ -68,6 +68,7 @@ let level = {
             [0, 2004, 372, 372, 372, 372, 372, 372, 372, 372, 372, 1140],
         ],
         header: {
+            // Walls position specifications
             276: { orientation: 8, main_index: 5, sub_index: 2, direction: 1, walk: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,] },
             372: { orientation: 2, main_index: 5, sub_index: 0, direction: 2, walk: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1,] },
             468: { orientation: 1, main_index: 5, sub_index: 0, direction: 1, walk: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0,] },
@@ -123,6 +124,7 @@ let level = {
 
         ],
         header: {
+            // Objects position specifications
             276: { orientation: 2, main_index: 9, sub_index: 12, direction: 2, walk: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0,] },
             372: { orientation: 2, main_index: 9, sub_index: 11, direction: 2, walk: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,] },
             468: { orientation: 12, main_index: 50, sub_index: 0, direction: 3, walk: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0,] },
@@ -191,8 +193,18 @@ let floor = document.getElementById("floor").getContext("2d");
 floor.w = floor.canvas.width;
 floor.h = floor.canvas.height;
 
-//variaveis de ambiente
-let tw = 160, th = tw / 2, s = tw * 0.705, a = Math.PI / 4, visible = 7, asin = acos = Math.sin(a);
+// Global ambient variables
+
+// Tile width 
+// Tile Height
+let tw = 160;
+let th = tw / 2;
+
+let s = tw * 0.705;
+let a = Math.PI / 4;
+
+let visible = 7;
+let asin = acos = Math.sin(a);
 
 // Informações dos monstros
 // Importante: BA é o barbaro, que deve ter sido adicionado por ter o mesmo comportamento
@@ -248,8 +260,8 @@ for (let l in level) {
 
 //"Engine"
 (function (undefined) {
-    hero = new HeroBarbarian(s * 3, s * 3);
-
+    // Hero instantiation(posX, posY)
+    hero = new HeroBarbarian(1000, 1000);
 
     setInterval(function () {
         hero.health = Math.min(hero.health + 10, hero.origin_health);
@@ -262,6 +274,7 @@ for (let l in level) {
     //for(let i=0;i<2;i++) barrels.push(new Barrel(randomx(),randomy()));
     for (let i = 0; i < 2; i++) potions.push(new PotionHealth(randomx(), randomy()));
 
+    // Instantiate walls
     for (let y in level.wall.map) {
         for (let x in level.wall.map[y]) {
             let index = level.wall.map[y][x];
@@ -270,6 +283,7 @@ for (let l in level) {
             }
         }
     }
+    // Instantiate objects
     for (let y in level.object.map) {
         for (let x in level.object.map[y]) {
             let index = level.object.map[y][x];
@@ -283,12 +297,14 @@ for (let l in level) {
     setInterval(function () {
         if (monsters.length == 0) return;
         let m = monsters[Math.ceil(Math.random() * (monsters.length - 1))];
-        if (typeof m.attacked != "object") {
+        if (typeof m.attacked != "object") {;
             m.to_x = m.x + (Math.random() * s - s / 2);
             m.to_y = m.y + (Math.random() * s - s / 2);
         }
         for (let i in monsters) {
-            let m = monsters[i], attackDist = 100;
+            let m = monsters[i]
+            // REFACTOR: Mobs attack distance in engine routine (??)
+            let attackDist = 100;
             if (m.attack && m.isAboveHero()) {
                 if (Math.abs(hero.x - m.x) < attackDist &&
                     Math.abs(hero.y - m.y) < attackDist) {
@@ -304,17 +320,19 @@ for (let l in level) {
     }, 200);
 
     floor.canvas.onclick = function (e) {
-        let mx = (e.offsetX == undefined ? e.layerX : e.offsetX) - floor.w / 2;
-        let my = (e.offsetY == undefined ? e.layerY : e.offsetY) - floor.h / 2;
-        let isCanClick = Math.abs(mx) < 100 && Math.abs(my) < 100;
-        my *= 2; //unscale
-        floor.click_x = hero.x + mx * Math.cos(-a) - my * Math.sin(-a);
-        floor.click_y = hero.y + mx * Math.sin(-a) + my * Math.cos(-a);
+        
+        let mouseX = e.offsetX - floor.w / 2;
+        let mouseY = e.offsetY - floor.h / 2;
+        let isCanClick = Math.abs(mouseX) < 100 && Math.abs(mouseY) < 100;
+        mouseY *= 2; //unscale
+        floor.click_x = hero.x + mouseX * Math.cos(-a) - mouseY * Math.sin(-a);
+        floor.click_y = hero.y + mouseX * Math.sin(-a) + mouseY * Math.cos(-a);
         if (isCanClick) if (processClick()) return;
         hero.to_x = floor.click_x;
         hero.to_y = floor.click_y;
     }
 
+    // Items manager
     window.onkeydown = function (e) {
         let beltKeys = [49, 50, 51, 52, 53, 54, 55, 56, 57, 48];
         let beltIndex = beltKeys.indexOf(e.keyCode);
@@ -331,6 +349,7 @@ for (let l in level) {
         }
     }
 
+    // Hero controller
     setInterval(function () {
         if (imageCount > 0) return;
         hero.nextStep();

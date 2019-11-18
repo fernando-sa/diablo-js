@@ -1,6 +1,4 @@
-// Classe mãe de diversas outras classes
-// TODO:
-// Criar nomes pertinentes as variaveis
+// TODO: Classe mãe de diversas outras classes e criar nomes pertinentes as variaveis
 class Shape {
     constructor(sprite, x, y) {
         this.x = x;
@@ -11,6 +9,8 @@ class Shape {
     }
 
     isAboveHero() {
+        // REFACTOR: Change maxlen name
+        // maxlen = detectRange
         let maxlen = tw * visible / 2;
         return (Math.abs(this.x - hero.x) <= maxlen) && (Math.abs(this.y - hero.y) <= maxlen);
     };
