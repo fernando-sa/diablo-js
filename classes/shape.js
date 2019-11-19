@@ -1,4 +1,3 @@
-// TODO: Classe mãe de diversas outras classes e criar nomes pertinentes as variaveis
 class Shape {
     constructor(sprite, x, y) {
         this.x = x;

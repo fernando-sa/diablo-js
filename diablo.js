@@ -1,13 +1,11 @@
-// Ainda tem bastante para "arrumar" neste arquivo
-
 //Contador de imagens
 let imageCount = 0;
 
-//Objeto com as informações necessárias para carregar a fase do jogo
-//Atualmente é uma única fase estatica
+// REFACTOR: Create a proper way to load a level
+// Draw level
 let level = {
     floor: {
-        // Caminho para a pasta com imagens do piso
+        // Floor tile positions
         prefix: "dttool/output/1/",
         map: [
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -42,7 +40,7 @@ let level = {
         }
     },
     wall: {
-        // Caminho para as imagens das paredes
+        // Walls position
         prefix: "dttool/output/0/",
         map: [
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -99,7 +97,7 @@ let level = {
         }
     },
     object: {
-        //caminho dos objetos (mesa, cadeiras, etc..)
+        // Objects placement
         prefix: "dttool/output/2/",
         map: [
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -188,10 +186,10 @@ let level = {
     }
 };
 
-//captura o canvas para criar a area do jogo
+// Get canvas to draw game
 let floor = document.getElementById("floor").getContext("2d");
-floor.w = floor.canvas.width;
-floor.h = floor.canvas.height;
+floor.width = floor.canvas.width;
+floor.height = floor.canvas.height;
 
 // Global ambient variables
 
@@ -203,11 +201,11 @@ let th = tw / 2;
 let s = tw * 0.705;
 let a = Math.PI / 4;
 
+// How many tiles are visible to player (and mobs?)
 let visible = 7;
 let asin = acos = Math.sin(a);
 
-// Informações dos monstros
-// Importante: BA é o barbaro, que deve ter sido adicionado por ter o mesmo comportamento
+// Map mobs sprites
 let monsterMap = {
     SK: {
         A1: loadImage("monsters/SK/A1/map.png", 8, 16, true),
@@ -235,15 +233,21 @@ let monsterMap = {
     }
 };
 
-// Variaveis que controlam os objetos da tela
-let monsters = [], deathmobs = [], barrels = [], coins = [], potions = [], walls = [];
-// Não testei ainda
+// Instantiate objects arrays
+let monsters = [];
+let deathmobs = [];
+let barrels = [];
+let coins = [];
+let potions = [];
+let walls = [];
+
+// Map initial state
 let showMap = false;
-// Carrega as imagens para o barril, moeda e poção
+// Load sprites
 let barrelSprite = loadImage("sprite/barrel64.png");
 let coinSprite = loadImage("sprite/coins10.png");
 let potionSprite = loadImage("sprite/potions.png");
-// nosso char
+// Player
 let hero;
 
 
@@ -259,10 +263,11 @@ for (let l in level) {
 
 
 //"Engine"
-(function (undefined) {
+(function () {
     // Hero instantiation(posX, posY)
     hero = new HeroBarbarian(1000, 1000);
 
+    // Health regen ???
     setInterval(function () {
         hero.health = Math.min(hero.health + 10, hero.origin_health);
     }, 2000);
@@ -271,7 +276,7 @@ for (let l in level) {
     for (let i = 0; i < 2; i++) monsters.push(new AgressiveMob(randomx(), randomy(), 'SK'));
     for (let i = 0; i < 2; i++) monsters.push(new AgressiveMob(randomx(), randomy(), 'FS'));
     for (let i = 0; i < 2; i++) monsters.push(new AgressiveMob(randomx(), randomy(), 'SI'));
-    //for(let i=0;i<2;i++) barrels.push(new Barrel(randomx(),randomy()));
+    // for(let i=0;i<2;i++) barrels.push(new Barrel(randomx(),randomy()));
     for (let i = 0; i < 2; i++) potions.push(new PotionHealth(randomx(), randomy()));
 
     // Instantiate walls
@@ -319,10 +324,12 @@ for (let l in level) {
         }
     }, 200);
 
+    // Movement controller
     floor.canvas.onclick = function (e) {
         
-        let mouseX = e.offsetX - floor.w / 2;
-        let mouseY = e.offsetY - floor.h / 2;
+        let mouseX = e.offsetX - floor.width / 2;
+        let mouseY = e.offsetY - floor.height / 2;
+        // Check if click target is valid
         let isCanClick = Math.abs(mouseX) < 100 && Math.abs(mouseY) < 100;
         mouseY *= 2; //unscale
         floor.click_x = hero.x + mouseX * Math.cos(-a) - mouseY * Math.sin(-a);
@@ -354,7 +361,7 @@ for (let l in level) {
         if (imageCount > 0) return;
         hero.nextStep();
         for (let i in monsters) monsters[i].nextStep();
-        floor.fillStyle = "black"; floor.fillRect(0, 0, floor.w, floor.h);
+        floor.fillStyle = "black"; floor.fillRect(0, 0, floor.width, floor.height);
         renderFloor();
         renderHeroHealth()
         renderHeroBelt();

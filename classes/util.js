@@ -1,20 +1,20 @@
-// TODO
 function loadImage(url, angles, steps, offsetX) {
     imageCount++;
-    let i = new Image();
-    i.onload = function () {
+    let image = new Image();
+    image.onload = function () {
         imageCount--;
-        i.offsetX = offsetX ? ((i.height / angles) >> 2) : 0;
+        // (image.height / angles) >> 2 = (image.height / angles) * (image.height / angles)
+        image.offsetX = offsetX ? ((image.height / angles) >> 2) : 0;
     }
-    i.src = url;
+    image.src = url;
     if (typeof angles != "undefined" && typeof steps != "undefined") {
-        i.angles = angles;
-        i.steps = steps;
+        image.angles = angles;
+        image.steps = steps;
     }
-    return i;
+    return image;
 }
 
-// TODO
+// Callled when an ambiente object is instantiated
 function load(img, callback) {
     if (img.complete) callback();
     else img.addEventListener('load', callback, false);

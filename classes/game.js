@@ -42,7 +42,7 @@ function renderHeroHealth() {
     // draw health colb
     floor.fillStyle = "black";
     floor.beginPath();
-    floor.arc(radius + padding, floor.h - radius - padding, radius + 4, 0, Math.PI * 2);
+    floor.arc(radius + padding, floor.height - radius - padding, radius + 4, 0, Math.PI * 2);
     floor.closePath();
     floor.fill();
     // draw health
@@ -51,7 +51,7 @@ function renderHeroHealth() {
     let angleFrom = Math.PI * (0.5 - percent);
     let angleTo = Math.PI * (0.5 + percent);
     floor.beginPath();
-    floor.arc(radius + padding, floor.h - radius - padding, radius, angleFrom, angleTo);
+    floor.arc(radius + padding, floor.height - radius - padding, radius, angleFrom, angleTo);
     floor.closePath();
     floor.fill();
     floor.restore();
@@ -77,8 +77,6 @@ function renderHeroBelt() {
     floor.restore();
 }
 
-// Zb = ?? 
-
 function loadZb(order, click) {
     let tmp_zb = [], zb = [];
     let all = [monsters, potions, barrels, click ? [] : [hero], click ? [] : walls];
@@ -93,7 +91,6 @@ function loadZb(order, click) {
     return zb;
 }
 
-// TODO
 function processClick() {
     let zb = loadZb(true, true);
     let cx = (floor.click_x - floor.click_y) * acos,
@@ -106,7 +103,9 @@ function processClick() {
 
         let spr_w = spr.angles ? spr.width / spr.angles : spr.width;
         let spr_h = spr.steps ? spr.height / spr.steps : spr.height;
+        // Check if click was to attack?
         if (cx >= sx - spr_w / 2 && cx <= sx + spr_w / 2 && cy >= sy - spr_h && cy <= sy) {
+            // Attack
             m.use(hero)
             return true;
         }
@@ -114,15 +113,14 @@ function processClick() {
     return false;
 }
 
-// TODO
 function renderObjects() {
     let zb = loadZb(false);
     for (z in zb) {
-        let m = zb[z];
+        let monster = zb[z];
         floor.save()
-        let sx = (m.x - m.y) * acos + m.offset_x,
-            sy = (m.x + m.y) / 2 * asin + m.offset_y;
-        let tile = m.sprite;
+        let sx = (monster.x - monster.y) * acos + monster.offset_x,
+            sy = (monster.x + monster.y) / 2 * asin + monster.offset_y;
+        let tile = monster.sprite;
         // render sprite
         let tw = tile.width;
         let th = tile.height
@@ -130,19 +128,19 @@ function renderObjects() {
             tw /= tile.steps;
             th /= tile.angles;
             floor.drawImage(tile,
-                tw * m.step, th * m.angle, tw, th,
+                tw * monster.step, th * monster.angle, tw, th,
                 Math.round(sx - tw / 2 - tile.offsetX), Math.round(sy - th), tw, th);
         } else {
             floor.drawImage(tile, Math.round(sx - tile.width / 2) + 1, Math.round(sy - tile.height) + 1);
         }
         floor.restore()
         // health line
-        if (m.health && m.origin_health && m != hero) {
+        if (monster.health && monster.origin_health && monster != hero) {
             floor.save()
             floor.globalAlpha = 0.7
             sy -= 90;
-            let lm = Math.floor(m.origin_health / 20),
-                lr = Math.floor(m.health / 20)
+            let lm = Math.floor(monster.origin_health / 20),
+                lr = Math.floor(monster.health / 20)
             floor.fillStyle = "black"
             floor.fillRect(sx - lm / 2 - 1, sy, lm + 2, 6);
             floor.fillStyle = "red"
@@ -155,7 +153,7 @@ function renderObjects() {
 // TODO
 function renderFloor() {
     floor.save();
-    floor.translate(floor.w / 2 - th, floor.h / 2);// translate to center
+    floor.translate(floor.width / 2 - th, floor.height / 2);// translate to center
     let fdx = Math.floor(hero.x / s), // hero tile
         fdy = Math.floor(hero.y / s),
         miny = Math.max(0, fdy - visible), // calculate camera visible tiles
@@ -185,7 +183,7 @@ function renderFloor() {
 
 function renderMap() {
     floor.save();
-    floor.translate(floor.w / 2, floor.h / 2);
+    floor.translate(floor.width / 2, floor.height / 2);
     let sc = 0.5;
     floor.scale(1 * sc, 0.5 * sc);
     floor.rotate(Math.PI * 0.25);
