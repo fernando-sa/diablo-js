@@ -1,6 +1,3 @@
-// TODO:Descobrir pq o nextStep da stackoverflow se tirar do construtor
-
-// This class handles everything for the agressiveMob, as knowing if it did damage
 class AgressiveMob extends Mob {
     constructor(x, y, name) {
         super(x, y, name);
@@ -9,10 +6,11 @@ class AgressiveMob extends Mob {
         this.attackOffset = monsterMap[name].attackOffset || 0;
         this.normalOffset = 0;
         this._nextStep = this.nextStep;
+        
         this.nextStep = function () {
             if (!this.isAboveHero())
-            // If it isn't in range, don't do anything ???
-            return;
+                // If it isn't in range, don't do anything
+                return;
             if (this.currentState == this.attack) {
                 if (this.step == (this.attack.steps - 1)) {
                     this.currentState = this.stay;
@@ -30,6 +28,7 @@ class AgressiveMob extends Mob {
                 this._nextStep();
             this.offset_y = this.currentState == this.attack ? this.attackOffset : this.normalOffset;
         };
+        // REFACTOR: Remove mob damage from here
         this.currentDamage = 30;
 
         this.attacked = null;

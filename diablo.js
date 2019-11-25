@@ -5,7 +5,9 @@ let imageCount = 0;
 // Draw level
 let level = {
     floor: {
-        // Floor tile positions
+        // Floor tile positions]
+        // It is used in game.js@getFloorTile. Tell
+
         prefix: "dttool/output/1/",
         map: [
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -193,8 +195,8 @@ floor.height = floor.canvas.height;
 
 // Global ambient variables
 
-// Tile width 
-// Tile Height
+// Tile width(?)
+// Tile Height(?)
 let tw = 160;
 let th = tw / 2;
 
@@ -251,10 +253,18 @@ let potionSprite = loadImage("sprite/potions.png");
 let hero;
 
 
-// TODO
+// Translate floor prefix into floor.tile
 for (let l in level) {
     level[l].tiles = {};
-    for (i in level[l].header) if (!level[l].tiles[i]) level[l].tiles[i] = loadImage(level[l].prefix + i + ".png");
+    for (i in level[l].header)
+        if (!level[l].tiles[i]){
+            // REFACTOR:
+            // @renderEngine
+            // Change how we tell which tile file we must load 
+            let tileFileName = level[l].prefix + i + ".png";
+            // console.log(i);
+            level[l].tiles[i] = loadImage(tileFileName);
+        }
 }
 
 
@@ -264,6 +274,13 @@ for (let l in level) {
 
 //"Engine"
 (function () {
+
+    // Frame time in ms
+    const tickTime = 66;
+
+    isPause = false;
+    frozenMonsters = false;
+
     // Hero instantiation(posX, posY)
     hero = new HeroBarbarian(1000, 1000);
 
@@ -298,27 +315,37 @@ for (let l in level) {
         }
     }
 
-    // passos para inimigos, ataque ao heroi
+    // Monsters positioning
     setInterval(function () {
-        if (monsters.length == 0) return;
-        let m = monsters[Math.ceil(Math.random() * (monsters.length - 1))];
-        if (typeof m.attacked != "object") {;
-            m.to_x = m.x + (Math.random() * s - s / 2);
-            m.to_y = m.y + (Math.random() * s - s / 2);
-        }
+        
+        // @USELESS
+        // if (monsters.length == 0) return;
+        // let m = monsters[Math.ceil(Math.random() * (monsters.length - 1))];
+        // if (typeof m.attacked != "object") {;
+        //     m.to_x = m.x + (Math.random() * s - s / 2);
+        //     m.to_y = m.y + (Math.random() * s - s / 2);
+        // }
+
         for (let i in monsters) {
             let m = monsters[i]
-            // REFACTOR: Mobs attack distance in engine routine (??)
+            // REFACTOR: Remove attackDist from here
             let attackDist = 100;
+            let isInDistance = Math.abs(hero.x - m.x) < attackDist
+                            && Math.abs(hero.y - m.y) < attackDist;
+
+            // Attack or move
             if (m.attack && m.isAboveHero()) {
-                if (Math.abs(hero.x - m.x) < attackDist &&
-                    Math.abs(hero.y - m.y) < attackDist) {
+                if (isInDistance) {
                     m.doAttack(hero);
                     m.to_x = m.x;
                     m.to_y = m.y;
+
                 } else {
+                    // TODO: Check if mob is in range to chase hero
+                    // Chase hero
                     m.to_x = hero.x;
                     m.to_y = hero.y;
+                    
                 }
             }
         }
@@ -326,7 +353,8 @@ for (let l in level) {
 
     // Movement controller
     floor.canvas.onclick = function (e) {
-        
+
+
         let mouseX = e.offsetX - floor.width / 2;
         let mouseY = e.offsetY - floor.height / 2;
         // Check if click target is valid
@@ -356,16 +384,33 @@ for (let l in level) {
         }
     }
 
-    // Hero controller
+    // TimeController controller
     setInterval(function () {
+        if(this.isPaused) return;
         if (imageCount > 0) return;
         hero.nextStep();
-        for (let i in monsters) monsters[i].nextStep();
-        floor.fillStyle = "black"; floor.fillRect(0, 0, floor.width, floor.height);
+        if(!this.frozenMonsters)
+            for (let i in monsters) monsters[i].nextStep();
+
+        // REFACTOR: Don't refil everthing everytime;
+        floor.fillStyle = "black";
+        floor.fillRect(0, 0, floor.width, floor.height);
         renderFloor();
         renderHeroHealth()
         renderHeroBelt();
         if (showMap) renderMap();
-    }, 66);
+    }, tickTime);
+    
+
+    window.addEventListener('keydown', (e) => {
+        if(e.keyCode == 27){
+            this.isPaused = ! this.isPaused;
+        }
+
+        if(e.keyCode == 80){
+            this.frozenMonsters = ! this.frozenMonsters;
+        }        
+     
+    });
 
 })();

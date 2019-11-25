@@ -11,10 +11,10 @@ class HeroBarbarian extends AgressiveMob {
         this.currentDamage = 320;
     }
 
-    addToBelt(potion) {
+    addToBelt(item) {
         for (let i = 0; i < this.belt.size; i++) {
             if (typeof this.belt.items[i] == "undefined") {
-                this.belt.items[i] = potion;
+                this.belt.items[i] = item;
                 return true;
             }
         }
@@ -22,6 +22,8 @@ class HeroBarbarian extends AgressiveMob {
     };
 
     getDamage() {
-        return this.currentDamage * (Math.random() <= this.criticalDamage ? 4 : 1);
+        let isCritical = Math.random() <= this.criticalDamage;
+        let damageMultiplier = isCritical ? 4 : 1;
+        return this.currentDamage * damageMultiplier;
     };
 }

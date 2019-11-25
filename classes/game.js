@@ -26,10 +26,11 @@ function isWayWall(x, y) {
     return true;
 }
 
-// TODO
+// If it is in map, render it;
 function getFloorTile(x, y) {
     if (!level.floor.map[y]) return null;
     if (!level.floor.map[y][x]) return null;
+    // Get what tile it is by level floor map in diablo.js
     let f = level.floor.map[y][x];
     return level.floor.tiles[f];
 }

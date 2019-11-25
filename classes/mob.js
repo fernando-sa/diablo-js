@@ -37,14 +37,19 @@ class Mob extends Shape {
         }
     };
 
+    // REFACTOR: Separate this logic
+    // Handle movement and animation
     nextStep() {
+        // Calculate distance to movement location
         let dx = (this.to_x - this.x), dy = (this.to_y - this.y);
-        if ((Math.sqrt((dx * dx) + (dy * dy))) > this.st) { // run
+        // Movement
+        if ((Math.sqrt((dx * dx) + (dy * dy))) > this.st) {
             let tx = 0;
             let ty = 0;
             for (let st = 0; st < this.st; st += 0.01) {
                 let sx = st * dx / Math.sqrt((dx * dx) + (dy * dy));
                 let sy = sx * dy / dx;
+                // Colision detection
                 if (isWayWall(this.x + sx, this.y + sy)) {
                     tx = sx;
                     ty = sy;
@@ -53,11 +58,13 @@ class Mob extends Shape {
                     break;
             }
             this.rotate(tx, ty);
+            // Run
             if (Math.sqrt((tx * tx) + (ty * ty)) >= this.st / 2) {
                 this.x += tx;
                 this.y += ty;
                 this.setState(this.run);
             }
+            // Idle
             else {
                 this.setState(this.stay);
                 this.x += tx;
@@ -71,6 +78,7 @@ class Mob extends Shape {
             this.to_x = this.x;
             this.to_y = this.y;
         }
+        // Animation
         this.step = (this.step + 1) % (this.currentState.steps);
         this.sprite = this.currentState;
     };
