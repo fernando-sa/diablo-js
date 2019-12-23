@@ -173,6 +173,7 @@ function renderFloor() {
             if (tile) {
                 let tx = (x - y) * th;
                 let ty = (x + y) * th / 2;
+                // TODO: 0.707 has something to do with rotation in horizontal axis with isometric view
                 floor.drawImage(tile, tx, ty, tile.width + 0.707, tile.height + 0.707);
             }
         }

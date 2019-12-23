@@ -275,7 +275,8 @@ for (let l in level) {
 //"Engine"
 (function () {
 
-    // Frame time in ms
+
+    // Frame time in ms. Game speed. 1x = 66
     const tickTime = 66;
 
     isPause = false;
@@ -289,12 +290,7 @@ for (let l in level) {
         hero.health = Math.min(hero.health + 10, hero.origin_health);
     }, 2000);
 
-
-    for (let i = 0; i < 2; i++) monsters.push(new AgressiveMob(randomx(), randomy(), 'SK'));
-    for (let i = 0; i < 2; i++) monsters.push(new AgressiveMob(randomx(), randomy(), 'FS'));
-    for (let i = 0; i < 2; i++) monsters.push(new AgressiveMob(randomx(), randomy(), 'SI'));
-    // for(let i=0;i<2;i++) barrels.push(new Barrel(randomx(),randomy()));
-    for (let i = 0; i < 2; i++) potions.push(new PotionHealth(randomx(), randomy()));
+    
 
     // Instantiate walls
     for (let y in level.wall.map) {
@@ -314,6 +310,13 @@ for (let l in level) {
             }
         }
     }
+
+
+    for (let i = 0; i < 2; i++) monsters.push(new AgressiveMob(randomx(), randomy(), 'SK'));
+    for (let i = 0; i < 2; i++) monsters.push(new AgressiveMob(randomx(), randomy(), 'FS'));
+    for (let i = 0; i < 2; i++) monsters.push(new AgressiveMob(randomx(), randomy(), 'SI'));
+    // for(let i=0;i<2;i++) barrels.push(new Barrel(randomx(),randomy()));
+    for (let i = 0; i < 2; i++) potions.push(new PotionHealth(randomx(), randomy()));
 
     // Monsters positioning
     setInterval(function () {
